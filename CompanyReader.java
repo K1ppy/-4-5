@@ -1,0 +1,98 @@
+package com.bsu;
+
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class CompanyReader {
+    private String filepath;
+    private String dateFormat;
+
+    public CompanyReader(String filepath, String dateFormat) {
+        this.filepath = filepath;
+        this.dateFormat = dateFormat;
+    }
+
+    public List<Company> readAllRecords() throws FileNotFoundException {
+        File file = new File(filepath);
+        List<Company> records = new ArrayList<>();
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                records.add(buildRecord(scanner.nextLine()));
+            }
+        } catch (Exception exception) {
+            throw new FileNotFoundException("Some problem with file");
+        }
+        return records;
+    }
+
+    public Company buildRecord(String str) throws IllegalArgumentException {
+        String[] fields = str.split(";");
+        if (fields.length < 12) {
+            throw new IllegalArgumentException("Not enough information to build record");
+        }
+        String name = fields[0];
+        String shortName = fields[1];
+        LocalDate actualizationDate;
+        String address = fields[3];
+        LocalDate foundationDate;
+        int numberOfMembers;
+        String auditor = fields[6];
+        String phoneNumber = fields[7];
+        String email = fields[8];
+        String industry = fields[9];
+        String typeOfActivity = fields[10];
+        String webAddress = fields[11];
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+            actualizationDate = LocalDate.parse(fields[2], formatter);
+            foundationDate = LocalDate.parse(fields[4], formatter);
+            numberOfMembers = Integer.parseInt(fields[5]);
+        } catch (Exception exception) {
+            throw new IllegalArgumentException("Cant parse data");
+        }
+
+        if (shortName.isEmpty()) {
+            throw new IllegalArgumentException("Short name should be filled");
+        }
+        if (industry.isEmpty()) {
+            throw new IllegalArgumentException("Industry should be filled");
+        }
+        if (typeOfActivity.isEmpty()) {
+            throw new IllegalArgumentException("Activity type should be filled");
+        }
+        if (fields[5].isEmpty()) {
+            throw new IllegalArgumentException("Employee number should be filled");
+        }
+        if (fields[4].isEmpty()) {
+            throw new IllegalArgumentException("Foundation date should be filled");
+        }
+        return new Company(name, shortName, actualizationDate, address, foundationDate, numberOfMembers, auditor,
+                phoneNumber, email, industry, typeOfActivity, webAddress);
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public String getFilepath(){
+        return filepath;
+    }
+
+    public void setDateFormat(String dateFormat){
+        this.dateFormat = dateFormat;
+    }
+
+    public void setFilepath(String filepath){
+        this.filepath = filepath;
+    }
+
+}
+
+
