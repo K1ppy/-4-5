@@ -1,0 +1,2 @@
+Thu Nov 19 01:40:45 MSK 2020 Program Started
+Thu Nov 19 01:40:57 MSK 2020 find company by short name: ГК Машека, number of results: 0
